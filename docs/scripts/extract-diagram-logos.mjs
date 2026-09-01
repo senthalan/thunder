@@ -1,0 +1,157 @@
+// Copyright 2026 The ThunderID Authors
+// SPDX-License-Identifier: Apache-2.0
+
+/**
+ * Extracts brand marks into scripts/product-diagram-logos.mjs, so the product
+ * diagrams draw the same artwork the docs site does instead of hand-drawn
+ * approximations. Re-run whenever a logo component or brand asset changes.
+ *
+ * Usage: node ./scripts/extract-diagram-logos.mjs
+ */
+import {readFileSync, writeFileSync} from 'fs';
+import {dirname, join} from 'path';
+import {fileURLToPath} from 'url';
+import {createLogger} from '@thunderid/logger';
+
+const logger = createLogger('extract-diagram-logos');
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const ICONS = join(ROOT, 'src/components/icons');
+const IMAGES = join(ROOT, 'static/assets/images');
+
+// Logo components, taken from the same files the docs pages import.
+const COMPONENTS = [
+  'NodeLogo',
+  'ExpressLogo',
+  'ReactLogo',
+  'NextLogo',
+  'VueLogo',
+  'NuxtLogo',
+  'ReactRouterLogo',
+  'TanStackLogo',
+  'BrowserLogo',
+  'JavaScriptLogo',
+  'IOSLogo',
+  'SkillsLogo',
+  'ClaudeLogo',
+  'CodexLogo',
+  'CliLogo',
+  'DockerLogo',
+];
+
+// Plain .svg brand assets. The product lockup ships in a light and an inverted
+// form, which map onto the diagrams' light and dark variants.
+const PLAIN = {
+  KubernetesLogo: join(IMAGES, 'kubernetes-logo.svg'),
+  ThunderIDLockup: join(IMAGES, 'logo.svg'),
+  ThunderIDLockupInverted: join(IMAGES, 'logo-inverted.svg'),
+};
+
+const KEBAB = [
+  ['fillRule', 'fill-rule'],
+  ['clipRule', 'clip-rule'],
+  ['strokeWidth', 'stroke-width'],
+  ['strokeLinecap', 'stroke-linecap'],
+  ['strokeLinejoin', 'stroke-linejoin'],
+  ['strokeMiterlimit', 'stroke-miterlimit'],
+  ['clipPath', 'clip-path'],
+  ['stopColor', 'stop-color'],
+  ['stopOpacity', 'stop-opacity'],
+  ['fillOpacity', 'fill-opacity'],
+  ['strokeOpacity', 'stroke-opacity'],
+];
+
+// Marks with no literal fill: their paths would default to black and disappear
+// on the dark variant, so the diagram paints them with the theme ink colour.
+const MONO = new Set(['NextLogo', 'IOSLogo']);
+
+/** Reads an attribute out of a raw tag string, or returns the fallback. */
+function attr(tag, name, fallback = '') {
+  const match = tag.match(new RegExp(`${name}="([^"]*)"`));
+  return match ? match[1] : fallback;
+}
+
+/** Namespaces every id so several marks can share one document. */
+function namespaceIds(body, name) {
+  const prefix = name.toLowerCase().replace(/logo$/, '') + '-';
+  for (const id of [...body.matchAll(/id="([^"]+)"/g)].map((m) => m[1])) {
+    body = body.split(`id="${id}"`).join(`id="${prefix}${id}"`);
+    body = body.split(`url(#${id})`).join(`url(#${prefix}${id})`);
+    body = body.split(`href="#${id}"`).join(`href="#${prefix}${id}"`);
+  }
+  return body;
+}
+
+const out = {};
+
+for (const name of COMPONENTS) {
+  const src = readFileSync(join(ICONS, `${name}.tsx`), 'utf8');
+  const match = src.match(/<svg([^>]*)>([\s\S]*)<\/svg>/);
+  if (!match) {
+    logger.warn(`No SVG found in ${name}`);
+    continue;
+  }
+  const [, root, inner] = match;
+
+  // Presentation attributes on the root element must move to the wrapper group,
+  // or stroke-only marks lose their stroke entirely.
+  const attrs = [];
+  for (const name of ['fill', 'stroke', 'strokeWidth', 'strokeLinecap', 'strokeLinejoin']) {
+    const value = attr(root, name);
+    if (value) attrs.push(`${(KEBAB.find(([jsx]) => jsx === name) || [name, name])[1]}="${value}"`);
+  }
+
+  let body = inner;
+  for (const [jsx, svg] of KEBAB) body = body.split(`${jsx}=`).join(`${svg}=`);
+  // style={{...}} carries real styling, so translate it rather than dropping it.
+  body = body.replace(/style=\{\{([^}]*)\}\}/g, (_, decls) => {
+    const css = decls
+      .split(',')
+      .map((d) => {
+        const [k, v] = d.split(':');
+        return v ? `${k.trim().replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}:${v.trim().replace(/['"]/g, '')}` : '';
+      })
+      .filter(Boolean)
+      .join(';');
+    return `style="${css}"`;
+  });
+  body = body.replace(/\sopacity=\{([\d.]+)\}/g, ' opacity="$1"');
+  body = body.replace(/\s[a-zA-Z-]+=\{[^{}]*\}/g, '');
+
+  out[name] = {
+    viewBox: attr(root, 'viewBox', '0 0 24 24'),
+    attrs: attrs.join(' '),
+    mono: MONO.has(name),
+    body: namespaceIds(body, name).replace(/\s+/g, ' ').trim(),
+  };
+}
+
+for (const [name, file] of Object.entries(PLAIN)) {
+  const src = readFileSync(file, 'utf8');
+  const match = src.match(/<svg([^>]*)>([\s\S]*)<\/svg>/);
+  const body = match[2].replace(/<title>[\s\S]*?<\/title>/g, '');
+  out[name] = {
+    viewBox: attr(match[1], 'viewBox', '0 0 24 24'),
+    attrs: '',
+    mono: false,
+    body: namespaceIds(body, name).replace(/\s+/g, ' ').trim(),
+  };
+}
+
+const header = [
+  '// Copyright 2026 The ThunderID Authors',
+  '// SPDX-License-Identifier: Apache-2.0',
+  '',
+  '/**',
+  ' * Brand marks for the product diagram set. Generated by',
+  ' * scripts/extract-diagram-logos.mjs from the logo components in',
+  ' * src/components/icons and the brand assets in static/assets/images.',
+  ' * Do not hand-edit: re-run the extractor instead.',
+  ' */',
+  '',
+].join('\n');
+
+writeFileSync(
+  join(ROOT, 'scripts/product-diagram-logos.mjs'),
+  `${header}export const LOGOS = ${JSON.stringify(out, null, 2)};\n`,
+);
+logger.info(`Extracted ${Object.keys(out).length} marks`);

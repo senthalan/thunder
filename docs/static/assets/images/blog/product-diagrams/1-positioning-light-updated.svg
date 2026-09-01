@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1620 440" width="1620" height="440" role="img" aria-label="ThunderID sits between the teams who configure identity and the humans, AI agents, and machines who authenticate."><title>ThunderID sits between the teams who configure identity and the humans, AI agents, and machines who authenticate.</title><style>
+:root{--ink:#0f172a;--mut:#64748b;--surf:#ffffff;--line:#cbd5e1;--acc-cfg:#2563eb;--acc-run:#0d9488;--acc-vc:#059669;--acc-agt:#b45309;--acc-cry:#dc2626;--acc-dat:#0e7490;}
+text { font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; fill: var(--ink); }
+.mut { fill: var(--mut); }
+.b { font-weight: 700; }
+.sb { font-weight: 600; }
+.it { font-style: italic; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.surf { fill: var(--surf); }
+.pill-bg { fill: var(--ink); }
+.pill-tx { fill: var(--surf); font-weight: 600; }
+.hair { stroke: var(--line); fill: none; }
+.arrow { stroke: var(--ink); fill: none; stroke-width: 2.2; }
+.arrow-mut { stroke: var(--mut); fill: none; stroke-width: 2; }
+.dash { stroke-dasharray: 8 7; }
+.dot { stroke-dasharray: 2 6; stroke-linecap: round; }
+</style>
+<defs>
+  <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="var(--ink)"/>
+  </marker>
+  <marker id="ahm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="var(--mut)"/>
+  </marker>
+  <marker id="ahs" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="var(--ink)"/>
+  </marker>
+</defs><rect x="40" y="108" width="350" height="230" rx="18" fill="none" stroke="var(--mut)" stroke-width="2" stroke-dasharray="3 7"/><text x="215" y="170" font-size="32" text-anchor="middle" font-weight="700">Developers and</text><text x="215" y="208" font-size="32" text-anchor="middle" font-weight="700">Platform Teams</text><text x="215" y="244" font-size="21" text-anchor="middle" class="mut">configure</text><rect x="64" y="266" width="302" height="48" rx="10" fill="none" stroke="var(--mut)" stroke-width="1.5" stroke-dasharray="3 6"/><text x="215" y="296" font-size="20" text-anchor="middle" class="mut">Console · API · MCP · YAML</text><rect x="1230" y="108" width="350" height="230" rx="18" fill="none" stroke="var(--mut)" stroke-width="2" stroke-dasharray="3 7"/><text x="1405" y="170" font-size="32" text-anchor="middle" font-weight="700">Humans, AI Agents</text><text x="1405" y="208" font-size="32" text-anchor="middle" font-weight="700">and Machines</text><text x="1405" y="244" font-size="21" text-anchor="middle" class="mut">authenticate</text><rect x="1254" y="266" width="302" height="48" rx="10" fill="none" stroke="var(--mut)" stroke-width="1.5" stroke-dasharray="3 6"/><text x="1405" y="296" font-size="20" text-anchor="middle" class="mut">Apps · Agents · Services</text><rect x="620" y="148" width="380" height="150" rx="20" fill="none" class="surf"/><rect x="620" y="148" width="380" height="150" rx="20" fill="none" stroke="var(--acc-cfg)" stroke-width="3"/><path d="M698,192 l34,0 l-16,28 l22,0 l-42,50 l12,-38 l-20,0 z" fill="var(--acc-cfg)"/><text x="760" y="240" font-size="46" font-weight="700">ThunderID</text><text x="505" y="178" font-size="22" text-anchor="middle">Define applications,</text><text x="505" y="208" font-size="22" text-anchor="middle">journeys, and policy</text><line x1="402" y1="250" x2="608" y2="250" class="arrow-mut" marker-end="url(#ahm)" marker-start="url(#ahm)"/><text x="505" y="292" font-size="21" text-anchor="middle" class="mut it">(GitOps-ready)</text><text x="1115" y="178" font-size="22" text-anchor="middle">Sign in, consent,</text><text x="1115" y="208" font-size="22" text-anchor="middle">present credentials</text><line x1="1012" y1="250" x2="1218" y2="250" class="arrow-mut" marker-end="url(#ahm)" marker-start="url(#ahm)"/><text x="1115" y="292" font-size="21" text-anchor="middle" class="mut it">(standards-based)</text><text x="810" y="386" font-size="23" text-anchor="middle" class="mut">One open-source IAM stack for every identity that touches your systems.</text></svg>
